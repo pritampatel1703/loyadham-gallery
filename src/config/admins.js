@@ -9,4 +9,5 @@ export const ALLOWED_ADMINS = [
     "gurujivichranlive@gmail.com",
     "loyadham1@gmail.com",
     "thakorjimaharaj8@gmail.com",
+    "work.pritampatel@gmail.com",
 ];
