@@ -19,7 +19,11 @@ const AdminLogin = () => {
             await loginAdmin(email, password);
             navigate('/admin');
         } catch (err) {
-            setError('Invalid email or password.');
+            if (err.message === "unauthorized_email") {
+                setError('This email is not authorized as an Admin.');
+            } else {
+                setError('Invalid email or password.');
+            }
         } finally {
             setLoading(false);
         }

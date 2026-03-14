@@ -33,7 +33,7 @@ const AdminDashboard = () => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (!user) {
                 navigate('/admin/login');
-            } else if (!ALLOWED_ADMINS.includes(user.email)) {
+            } else if (!ALLOWED_ADMINS.includes(user.email?.toLowerCase())) {
                 logoutAdmin().then(() => navigate('/admin/login'));
             } else {
                 loadEvents();
