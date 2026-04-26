@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { ALLOWED_ADMINS } from "../config/admins";
 
@@ -42,6 +42,15 @@ export const logoutAdmin = async () => {
         await signOut(auth);
     } catch (error) {
         console.error("Logout Error:", error);
+        throw error;
+    }
+};
+
+export const resetPassword = async (email) => {
+    try {
+        await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+        console.error("Password Reset Error:", error);
         throw error;
     }
 };

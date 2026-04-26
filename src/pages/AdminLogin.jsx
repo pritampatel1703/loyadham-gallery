@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginAdmin, loginWithGoogle } from '../utils/auth';
+import { loginAdmin, loginWithGoogle, resetPassword } from '../utils/auth';
 import { ALLOWED_ADMINS } from '../config/admins';
 
 const AdminLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
+        setMessage('');
         setLoading(true);
 
         try {
@@ -31,6 +33,7 @@ const AdminLogin = () => {
 
     const handleGoogleLogin = async () => {
         setError('');
+        setMessage('');
         setLoading(true);
         try {
             await loginWithGoogle();
@@ -41,6 +44,24 @@ const AdminLogin = () => {
             } else {
                 setError('Google sign-in failed.');
             }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResetPassword = async () => {
+        if (!email) {
+            setError('Please enter your email address first to reset the password.');
+            return;
+        }
+        setError('');
+        setMessage('');
+        setLoading(true);
+        try {
+            await resetPassword(email);
+            setMessage('Password reset email sent! Please check your inbox.');
+        } catch (err) {
+            setError('Failed to send reset email. Please ensure the email is correct.');
         } finally {
             setLoading(false);
         }
@@ -64,6 +85,12 @@ const AdminLogin = () => {
                     </div>
                 )}
 
+                {message && (
+                    <div className="bg-green-50 text-green-600 border border-green-200 p-3 rounded-lg text-sm mb-6 text-center">
+                        {message}
+                    </div>
+                )}
+
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-brand-charcoal mb-1">Email Address</label>
@@ -78,7 +105,16 @@ const AdminLogin = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-brand-charcoal mb-1">Password</label>
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="block text-sm font-medium text-brand-charcoal">Password</label>
+                            <button 
+                                type="button" 
+                                onClick={handleResetPassword}
+                                className="text-sm text-brand-navy hover:text-brand-gold transition-colors"
+                            >
+                                Forgot Password?
+                            </button>
+                        </div>
                         <input
                             type="password"
                             required

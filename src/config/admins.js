@@ -8,7 +8,7 @@ export const ALLOWED_ADMINS = [
     // "thakorjimaharaj26758@gmail.com",
     // "gurujivichranlive@gmail.com",
     "loyadham1@gmail.com", //google login
-    "thakorjimaharaj8@gmail.com", //google login
+    "thakorjimaharaj8@gmail.com", //email login
     "work.pritampatel@gmail.com", //google login
     "loyadhamgallery@loyadham.in", //email login (general login)
 ];
