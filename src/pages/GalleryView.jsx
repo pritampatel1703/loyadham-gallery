@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getEventById, getEventPhotos } from '../utils/db';
 import { findMatches } from '../utils/faceApi';
@@ -25,19 +25,19 @@ const GalleryView = () => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedPhotoIndex]);
+    }, [selectedPhotoIndex, handleNextPhoto, handlePrevPhoto]);
 
-    const handleNextPhoto = () => {
+    const handleNextPhoto = useCallback(() => {
         if (selectedPhotoIndex !== null && selectedPhotoIndex < matchingPhotos.length - 1) {
             setSelectedPhotoIndex(prev => prev + 1);
         }
-    };
+    }, [selectedPhotoIndex, matchingPhotos.length]);
 
-    const handlePrevPhoto = () => {
+    const handlePrevPhoto = useCallback(() => {
         if (selectedPhotoIndex !== null && selectedPhotoIndex > 0) {
             setSelectedPhotoIndex(prev => prev - 1);
         }
-    };
+    }, [selectedPhotoIndex]);
 
     useEffect(() => {
         // 1. Retrieve the saved selfie face descriptor
@@ -50,12 +50,12 @@ const GalleryView = () => {
         try {
             const descriptor = JSON.parse(savedDescriptorJson);
             setSelfieDescriptor(descriptor);
-            fetchAndMatchPhotos(descriptor);
+            fetchAndMatchPhotos();
         } catch (e) {
-            console.error("Failed to parse selfie data");
+            console.error("Failed to parse selfie data", e);
             navigate(`/event/${eventId}`);
         }
-    }, [eventId, navigate]);
+    }, [eventId, navigate, fetchAndMatchPhotos]);
 
     useEffect(() => {
         if (!allPhotos.length || !selfieDescriptor) return;
@@ -67,6 +67,7 @@ const GalleryView = () => {
             try {
                 parsedDescriptors = JSON.parse(photo.descriptors);
             } catch (e) {
+                console.error(e);
                 return false;
             }
 
@@ -81,7 +82,7 @@ const GalleryView = () => {
         setMatchingPhotos(matches);
     }, [allPhotos, selfieDescriptor, matchThreshold]);
 
-    const fetchAndMatchPhotos = async (guestSelfieDesc) => {
+    const fetchAndMatchPhotos = useCallback(async () => {
         setLoading(true);
         try {
             // 2. Load Event Data
@@ -96,7 +97,7 @@ const GalleryView = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [eventId]);
 
     const downloadPhoto = async (url) => {
         try {
@@ -111,6 +112,7 @@ const GalleryView = () => {
             document.body.removeChild(link);
             window.URL.revokeObjectURL(objectUrl);
         } catch (e) {
+            console.error(e);
             // Fallback for CORS issues if Cloudinary isn't configured for blob download
             window.open(url, '_blank');
         }

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSingleFaceDescriptor } from '../utils/faceApi';
 
@@ -9,24 +9,25 @@ const GuestSelfie = () => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
 
-    const [stream, setStream] = useState(null);
+
     const [error, setError] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [permissionDenied, setPermissionDenied] = useState(false);
 
-    useEffect(() => {
-        startCamera();
-        return () => stopCamera(); // Cleanup when unmounting
+    const stopCamera = useCallback(() => {
+        if (videoRef.current && videoRef.current.srcObject) {
+            videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+        }
     }, []);
 
-    const startCamera = async () => {
+    const startCamera = useCallback(async () => {
         try {
             setError('');
             setPermissionDenied(false);
             const mediaStream = await navigator.mediaDevices.getUserMedia({
                 video: { facingMode: 'user' } // Use front camera
             });
-            setStream(mediaStream);
+
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
             }
@@ -35,13 +36,13 @@ const GuestSelfie = () => {
             setPermissionDenied(true);
             setError('Camera access denied. Please allow camera permissions to scan your face.');
         }
-    };
+    }, []);
 
-    const stopCamera = () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-    };
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        startCamera();
+        return () => stopCamera(); // Cleanup when unmounting
+    }, [startCamera, stopCamera]);
 
     const handleCapture = async () => {
         if (!videoRef.current || !canvasRef.current) return;

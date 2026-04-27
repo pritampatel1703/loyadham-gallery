@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { auth } from '../config/firebase';
 import { getEventById, savePhotoMetadata, getEventPhotos, deleteEventPhoto, updateEvent } from '../utils/db';
@@ -23,32 +23,9 @@ const EventAdmin = () => {
     // Hidden canvas/img for face-api processing
     const imgRef = useRef(null);
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-            if (!user) {
-                navigate('/admin/login');
-            } else if (!ALLOWED_ADMINS.includes(user.email?.toLowerCase())) {
-                logoutAdmin().then(() => navigate('/admin/login'));
-            } else {
-                loadEventData();
-            }
-        });
-        return () => unsubscribe();
-    }, [eventId, navigate]);
 
-    // Handle keyboard navigation for Lightbox
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (lightboxIndex === null) return;
-            if (e.key === 'Escape') setLightboxIndex(null);
-            if (e.key === 'ArrowLeft') handlePrevPhoto();
-            if (e.key === 'ArrowRight') handleNextPhoto();
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [lightboxIndex]);
 
-    const loadEventData = async () => {
+    const loadEventData = useCallback(async () => {
         const data = await getEventById(eventId);
         if (data) {
             setEventData(data);
@@ -71,7 +48,7 @@ const EventAdmin = () => {
             });
             navigate('/admin');
         }
-    };
+    }, [eventId, navigate]);
 
     const handleFileUpload = async (e) => {
         const files = Array.from(e.target.files);
@@ -151,7 +128,7 @@ const EventAdmin = () => {
         setPhotos(updatedPhotos);
     };
 
-    const handleDeletePhoto = async (photoId, photoUrl) => {
+    const handleDeletePhoto = async (photoId) => {
         const result = await Swal.fire({
             title: 'Delete Photo?',
             text: "This photo will be permanently removed from the event gallery.",
@@ -194,17 +171,42 @@ const EventAdmin = () => {
         setLightboxIndex(index);
     };
 
-    const handleNextPhoto = () => {
+    const handleNextPhoto = useCallback(() => {
         if (lightboxIndex !== null && lightboxIndex < photos.length - 1) {
             setLightboxIndex(prev => prev + 1);
         }
-    };
+    }, [lightboxIndex, photos.length]);
 
-    const handlePrevPhoto = () => {
+    const handlePrevPhoto = useCallback(() => {
         if (lightboxIndex !== null && lightboxIndex > 0) {
             setLightboxIndex(prev => prev - 1);
         }
-    };
+    }, [lightboxIndex]);
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (!user) {
+                navigate('/admin/login');
+            } else if (!ALLOWED_ADMINS.includes(user.email?.toLowerCase())) {
+                logoutAdmin().then(() => navigate('/admin/login'));
+            } else {
+                loadEventData();
+            }
+        });
+        return () => unsubscribe();
+    }, [eventId, navigate, loadEventData]);
+
+    // Handle keyboard navigation for Lightbox
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (lightboxIndex === null) return;
+            if (e.key === 'Escape') setLightboxIndex(null);
+            if (e.key === 'ArrowLeft') handlePrevPhoto();
+            if (e.key === 'ArrowRight') handleNextPhoto();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [lightboxIndex, handleNextPhoto, handlePrevPhoto]);
 
     const downloadPhoto = async (url) => {
         try {
@@ -219,6 +221,7 @@ const EventAdmin = () => {
             document.body.removeChild(link);
             window.URL.revokeObjectURL(objectUrl);
         } catch (e) {
+            console.error(e);
             window.open(url, '_blank');
         }
     };
@@ -283,7 +286,7 @@ const EventAdmin = () => {
                     </button>
                     <h2 className="text-3xl font-bold text-brand-navy">{eventData.name}</h2>
                     <p className="text-gray-600 mt-1">
-                        {new Date(eventData.date || Date.now()).toLocaleDateString()} | {eventData.location}
+                        {new Date(eventData.date).toLocaleDateString()} | {eventData.location}
                     </p>
                 </div>
                 <div>
@@ -357,7 +360,10 @@ const EventAdmin = () => {
                                         try {
                                             const descriptors = JSON.parse(photo.descriptors || "[]");
                                             return `${descriptors.length} faces`;
-                                        } catch (e) { return "0 faces"; }
+                                        } catch (err) { 
+                                            console.error(err);
+                                            return "0 faces"; 
+                                        }
                                     })()}
                                 </div>
 
@@ -365,7 +371,7 @@ const EventAdmin = () => {
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleDeletePhoto(photo.id, photo.url);
+                                        handleDeletePhoto(photo.id);
                                     }}
                                     className="absolute top-2 right-2 bg-red-500/90 text-white p-2 text-sm rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-lg"
                                     title="Delete Photo"

@@ -1,0 +1,190 @@
+
+> loyadham-gallery@0.0.0 lint
+> eslint .
+
+
+C:\PRITAM 5TB\PRITAM\coding\loyadham-gallery\src\pages\AdminLogin.jsx
+  63:18  error  'err' is defined but never used  no-unused-vars
+
+C:\PRITAM 5TB\PRITAM\coding\loyadham-gallery\src\pages\EventAdmin.jsx
+   33:17  error    Error: Cannot access variable before it is declared
+
+`loadEventData` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  31 |                 logoutAdmin().then(() => navigate('/admin/login'));
+  32 |             } else {
+> 33 |                 loadEventData();
+     |                 ^^^^^^^^^^^^^ `loadEventData` accessed before it is declared
+  34 |             }
+  35 |         });
+  36 |         return () => unsubscribe();
+
+  49 |     }, [lightboxIndex]);
+  50 |
+> 51 |     const loadEventData = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 52 |         const data = await getEventById(eventId);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 53 |         if (data) {
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |         }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |     };
+     | ^^^^^^^ `loadEventData` is declared here
+  75 |
+  76 |     const handleFileUpload = async (e) => {
+  77 |         const files = Array.from(e.target.files);                                                                                                                                                                                                                                                                                           react-hooks/immutability
+   37:8   warning  React Hook useEffect has a missing dependency: 'loadEventData'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react-hooks/exhaustive-deps
+   44:40  error    Error: Cannot access variable before it is declared
+
+`handlePrevPhoto` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  42 |             if (lightboxIndex === null) return;
+  43 |             if (e.key === 'Escape') setLightboxIndex(null);
+> 44 |             if (e.key === 'ArrowLeft') handlePrevPhoto();
+     |                                        ^^^^^^^^^^^^^^^ `handlePrevPhoto` accessed before it is declared
+  45 |             if (e.key === 'ArrowRight') handleNextPhoto();
+  46 |         };
+  47 |         window.addEventListener('keydown', handleKeyDown);
+
+  201 |     };
+  202 |
+> 203 |     const handlePrevPhoto = () => {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 204 |         if (lightboxIndex !== null && lightboxIndex > 0) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 205 |             setLightboxIndex(prev => prev - 1);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 206 |         }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 207 |     };
+      | ^^^^^^^ `handlePrevPhoto` is declared here
+  208 |
+  209 |     const downloadPhoto = async (url) => {
+  210 |         try {                                                                                                                                    react-hooks/immutability
+   45:41  error    Error: Cannot access variable before it is declared
+
+`handleNextPhoto` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  43 |             if (e.key === 'Escape') setLightboxIndex(null);
+  44 |             if (e.key === 'ArrowLeft') handlePrevPhoto();
+> 45 |             if (e.key === 'ArrowRight') handleNextPhoto();
+     |                                         ^^^^^^^^^^^^^^^ `handleNextPhoto` accessed before it is declared
+  46 |         };
+  47 |         window.addEventListener('keydown', handleKeyDown);
+  48 |         return () => window.removeEventListener('keydown', handleKeyDown);
+
+  195 |     };
+  196 |
+> 197 |     const handleNextPhoto = () => {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 198 |         if (lightboxIndex !== null && lightboxIndex < photos.length - 1) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 199 |             setLightboxIndex(prev => prev + 1);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 200 |         }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 201 |     };
+      | ^^^^^^^ `handleNextPhoto` is declared here
+  202 |
+  203 |     const handlePrevPhoto = () => {
+  204 |         if (lightboxIndex !== null && lightboxIndex > 0) {  react-hooks/immutability
+   49:8   warning  React Hook useEffect has missing dependencies: 'handleNextPhoto' and 'handlePrevPhoto'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+  154:47  error    'photoUrl' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+  221:18  error    'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-unused-vars
+  286:53  error    Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  284 |                     <h2 className="text-3xl font-bold text-brand-navy">{eventData.name}</h2>
+  285 |                     <p className="text-gray-600 mt-1">
+> 286 |                         {new Date(eventData.date || Date.now()).toLocaleDateString()} | {eventData.location}
+      |                                                     ^^^^^^^^^^ Cannot call impure function
+  287 |                     </p>
+  288 |                 </div>
+  289 |                 <div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-hooks/purity
+  360:50  error    'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-unused-vars
+
+C:\PRITAM 5TB\PRITAM\coding\loyadham-gallery\src\pages\EventLanding.jsx
+   4:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+  44:98  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  42 |
+  43 |                     <div className="flex justify-center items-center gap-4 text-gray-600 mb-10">
+> 44 |                         <span className="flex items-center gap-1">📅 {new Date(eventData.date || Date.now()).toLocaleDateString()}</span>
+     |                                                                                                  ^^^^^^^^^^ Cannot call impure function
+  45 |                         <span>•</span>
+  46 |                         <span className="flex items-center gap-1">📍 {eventData.location}</span>
+  47 |                     </div>  react-hooks/purity
+
+C:\PRITAM 5TB\PRITAM\coding\loyadham-gallery\src\pages\GalleryView.jsx
+   28:8   warning  React Hook useEffect has missing dependencies: 'handleNextPhoto' and 'handlePrevPhoto'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+   54:18  error    'e' is defined but never used                                                                                                               no-unused-vars
+   58:8   warning  React Hook useEffect has a missing dependency: 'fetchAndMatchPhotos'. Either include it or remove the dependency array                      react-hooks/exhaustive-deps
+   69:22  error    'e' is defined but never used                                                                                                               no-unused-vars
+   84:40  error    'guestSelfieDesc' is defined but never used                                                                                                 no-unused-vars
+  113:18  error    'e' is defined but never used                                                                                                               no-unused-vars
+
+C:\PRITAM 5TB\PRITAM\coding\loyadham-gallery\src\pages\GuestSelfie.jsx
+  18:9   error    Error: Cannot access variable before it is declared
+
+`startCamera` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  16 |
+  17 |     useEffect(() => {
+> 18 |         startCamera();
+     |         ^^^^^^^^^^^ `startCamera` accessed before it is declared
+  19 |         return () => stopCamera(); // Cleanup when unmounting
+  20 |     }, []);
+  21 |
+
+  20 |     }, []);
+  21 |
+> 22 |     const startCamera = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 23 |         try {
+     | ^^^^^^^^^^^^^
+> 24 |             setError('');
+     …
+     | ^^^^^^^^^^^^^
+> 37 |         }
+     | ^^^^^^^^^^^^^
+> 38 |     };
+     | ^^^^^^^ `startCamera` is declared here
+  39 |
+  40 |     const stopCamera = () => {
+  41 |         if (stream) {                                                                                                                                            react-hooks/immutability
+  19:22  error    Error: Cannot access variable before it is declared
+
+`stopCamera` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  17 |     useEffect(() => {
+  18 |         startCamera();
+> 19 |         return () => stopCamera(); // Cleanup when unmounting
+     |                      ^^^^^^^^^^ `stopCamera` accessed before it is declared
+  20 |     }, []);
+  21 |
+  22 |     const startCamera = async () => {
+
+  38 |     };
+  39 |
+> 40 |     const stopCamera = () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |         if (stream) {
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 42 |             stream.getTracks().forEach(track => track.stop());
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 43 |         }
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 44 |     };
+     | ^^^^^^^ `stopCamera` is declared here
+  45 |
+  46 |     const handleCapture = async () => {
+  47 |         if (!videoRef.current || !canvasRef.current) return;  react-hooks/immutability
+  20:8   warning  React Hook useEffect has a missing dependency: 'stopCamera'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/exhaustive-deps
+
+✖ 21 problems (16 errors, 5 warnings)
+

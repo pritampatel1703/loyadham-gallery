@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getEventById } from '../utils/db';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
 const EventLanding = () => {
@@ -41,7 +42,7 @@ const EventLanding = () => {
                     <h2 className="text-4xl md:text-5xl font-bold text-brand-navy mb-4 font-sans">{eventData.name}</h2>
 
                     <div className="flex justify-center items-center gap-4 text-gray-600 mb-10">
-                        <span className="flex items-center gap-1">📅 {new Date(eventData.date || Date.now()).toLocaleDateString()}</span>
+                        <span className="flex items-center gap-1">📅 {eventData.date ? new Date(eventData.date).toLocaleDateString() : 'TBD'}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1">📍 {eventData.location}</span>
                     </div>

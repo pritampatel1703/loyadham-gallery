@@ -1,3 +1,6 @@
+import { storage } from '../config/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 // Helper function to compress images before upload
 // This prevents the "File size too large" (10MB) error on free Cloudinary tiers
 const compressImage = (file, maxWidth = 4000, quality = 0.95) => {
@@ -83,7 +86,21 @@ export const uploadToCloudinary = async (file) => {
 
         return data.secure_url;
     } catch (error) {
-        console.error("Error uploading to Cloudinary:", error);
-        throw error;
+        console.warn("Cloudinary upload blocked or failed, falling back to Firebase Storage:", error);
+        
+        try {
+            // Create a unique file name
+            const timestamp = Date.now();
+            const safeName = file.name ? file.name.replace(/[^a-z0-9.]/gi, '_') : 'image.jpg';
+            const storageRef = ref(storage, `gallery_uploads/${timestamp}_${safeName}`);
+            
+            const snapshot = await uploadBytes(storageRef, fileToUpload);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            
+            return downloadURL;
+        } catch (firebaseError) {
+            console.error("Firebase Storage fallback also failed:", firebaseError);
+            throw new Error("Failed to upload image. Please check your network or disable AdBlock/Antivirus.");
+        }
     }
 };
