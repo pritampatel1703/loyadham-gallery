@@ -46,7 +46,11 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const data = await getEvents();
-            setEvents(data.sort((a, b) => b.createdAt?.toMillis() - a.createdAt?.toMillis()));
+            setEvents(data.sort((eventA, eventB) => {
+                const timeA = (eventA.createdAt && typeof eventA.createdAt.toMillis === 'function') ? eventA.createdAt.toMillis() : 0;
+                const timeB = (eventB.createdAt && typeof eventB.createdAt.toMillis === 'function') ? eventB.createdAt.toMillis() : 0;
+                return timeB - timeA;
+            }));
         } catch (error) {
             console.error("Failed to load events", error);
         } finally {

@@ -78,7 +78,11 @@ const GalleryView = () => {
         });
 
         // Sort newest first
-        matches.sort((a, b) => (b.uploadedAt?.toMillis?.() || 0) - (a.uploadedAt?.toMillis?.() || 0));
+        matches.sort((photoA, photoB) => {
+            const timeA = (photoA.uploadedAt && typeof photoA.uploadedAt.toMillis === 'function') ? photoA.uploadedAt.toMillis() : 0;
+            const timeB = (photoB.uploadedAt && typeof photoB.uploadedAt.toMillis === 'function') ? photoB.uploadedAt.toMillis() : 0;
+            return timeB - timeA;
+        });
         setMatchingPhotos(matches);
     }, [allPhotos, selfieDescriptor, matchThreshold]);
 
