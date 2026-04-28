@@ -12,7 +12,6 @@ const GalleryView = () => {
     const [matchingPhotos, setMatchingPhotos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selfieDescriptor, setSelfieDescriptor] = useState(null);
-    const [matchThreshold, setMatchThreshold] = useState(0.45);
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
 
     const handleNextPhoto = useCallback(() => {
@@ -91,7 +90,7 @@ const GalleryView = () => {
             if (!Array.isArray(parsedDescriptors) || parsedDescriptors.length === 0) return false;
 
             // findMatches checks the guest's face array against the array of faces in the photo
-            return findMatches(selfieDescriptor, parsedDescriptors, matchThreshold);
+            return findMatches(selfieDescriptor, parsedDescriptors);
         });
 
         // Sort newest first
@@ -101,7 +100,7 @@ const GalleryView = () => {
             return timeB - timeA;
         });
         setMatchingPhotos(matches);
-    }, [allPhotos, selfieDescriptor, matchThreshold]);
+    }, [allPhotos, selfieDescriptor]);
 
 
 
@@ -138,30 +137,7 @@ const GalleryView = () => {
         <div>
             <div className="text-center mb-10 pt-4 border-b-2 border-brand-gold pb-6">
                 <h2 className="text-3xl md:text-4xl font-bold text-brand-navy mb-2 heading-decorative">{eventData.name}</h2>
-                <p className="text-gray-600 mb-6">We found <span className="font-bold text-brand-navy">{matchingPhotos.length}</span> photos of you!</p>
-
-                {/* Strictness Slider */}
-                <div className="max-w-md mx-auto bg-white p-4 rounded-xl shadow-sm border border-brand-navy/10 pt-4">
-                    <div className="flex justify-between items-center mb-2">
-                        <label className="text-sm font-semibold text-brand-navy">AI Search Tolerance</label>
-                        <span className="text-xs bg-brand-light text-brand-navy px-2 py-1 rounded font-mono font-bold">
-                            {matchThreshold.toFixed(2)}
-                        </span>
-                    </div>
-                    <input
-                        type="range"
-                        min="0.30"
-                        max="0.80"
-                        step="0.01"
-                        value={matchThreshold}
-                        onChange={(e) => setMatchThreshold(parseFloat(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-gold"
-                    />
-                    <div className="flex justify-between text-xs text-brand-gold mt-2 font-semibold">
-                        <span>Strict Matches Only</span>
-                        <span>Show More (Lenient)</span>
-                    </div>
-                </div>
+                <p className="text-gray-600 mb-2">We found <span className="font-bold text-brand-navy">{matchingPhotos.length}</span> photos of you!</p>
             </div>
 
             {matchingPhotos.length === 0 ? (
