@@ -15,6 +15,18 @@ const GalleryView = () => {
     const [matchThreshold, setMatchThreshold] = useState(0.45);
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
 
+    const handleNextPhoto = useCallback(() => {
+        if (selectedPhotoIndex !== null && selectedPhotoIndex < matchingPhotos.length - 1) {
+            setSelectedPhotoIndex(prev => prev + 1);
+        }
+    }, [selectedPhotoIndex, matchingPhotos.length]);
+
+    const handlePrevPhoto = useCallback(() => {
+        if (selectedPhotoIndex !== null && selectedPhotoIndex > 0) {
+            setSelectedPhotoIndex(prev => prev - 1);
+        }
+    }, [selectedPhotoIndex]);
+
     // Handle keyboard navigation for Lightbox
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -27,17 +39,22 @@ const GalleryView = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedPhotoIndex, handleNextPhoto, handlePrevPhoto]);
 
-    const handleNextPhoto = useCallback(() => {
-        if (selectedPhotoIndex !== null && selectedPhotoIndex < matchingPhotos.length - 1) {
-            setSelectedPhotoIndex(prev => prev + 1);
-        }
-    }, [selectedPhotoIndex, matchingPhotos.length]);
+    const fetchAndMatchPhotos = useCallback(async () => {
+        setLoading(true);
+        try {
+            // 2. Load Event Data
+            const eventDetails = await getEventById(eventId);
+            setEventData(eventDetails);
 
-    const handlePrevPhoto = useCallback(() => {
-        if (selectedPhotoIndex !== null && selectedPhotoIndex > 0) {
-            setSelectedPhotoIndex(prev => prev - 1);
+            // 3. Load All Photos for this event (matching is now handled by useEffect)
+            const photos = await getEventPhotos(eventId);
+            setAllPhotos(photos);
+        } catch (error) {
+            console.error("Error fetching and matching:", error);
+        } finally {
+            setLoading(false);
         }
-    }, [selectedPhotoIndex]);
+    }, [eventId]);
 
     useEffect(() => {
         // 1. Retrieve the saved selfie face descriptor
@@ -86,22 +103,7 @@ const GalleryView = () => {
         setMatchingPhotos(matches);
     }, [allPhotos, selfieDescriptor, matchThreshold]);
 
-    const fetchAndMatchPhotos = useCallback(async () => {
-        setLoading(true);
-        try {
-            // 2. Load Event Data
-            const eventDetails = await getEventById(eventId);
-            setEventData(eventDetails);
 
-            // 3. Load All Photos for this event (matching is now handled by useEffect)
-            const photos = await getEventPhotos(eventId);
-            setAllPhotos(photos);
-        } catch (error) {
-            console.error("Error fetching and matching:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [eventId]);
 
     const downloadPhoto = async (url) => {
         try {
