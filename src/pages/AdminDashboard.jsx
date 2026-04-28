@@ -86,7 +86,7 @@ const AdminDashboard = () => {
             await loadEvents();
         } catch (error) {
             console.error("Error creating event", error);
-            Swal.fire({ title: 'Error', text: 'Failed to create event', icon: 'error', confirmButtonColor: '#0C3C67' });
+            Swal.fire({ title: 'Error', text: `Failed to create event: ${error.message || error}`, icon: 'error', confirmButtonColor: '#0C3C67' });
         } finally {
             setIsUploading(false);
         }

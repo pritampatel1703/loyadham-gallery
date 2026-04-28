@@ -100,7 +100,7 @@ export const uploadToCloudinary = async (file) => {
             return downloadURL;
         } catch (firebaseError) {
             console.error("Firebase Storage fallback also failed:", firebaseError);
-            throw new Error("Failed to upload image. Please check your network or disable AdBlock/Antivirus.");
+            throw new Error(`Fallback upload failed: ${firebaseError.message || firebaseError}. Check your network or disable AdBlock/Antivirus.`);
         }
     }
 };

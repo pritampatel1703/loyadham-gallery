@@ -71,14 +71,14 @@ const GalleryView = () => {
                 return false;
             }
 
-            if (parsedDescriptors.length === 0) return false;
+            if (!Array.isArray(parsedDescriptors) || parsedDescriptors.length === 0) return false;
 
             // findMatches checks the guest's face array against the array of faces in the photo
             return findMatches(selfieDescriptor, parsedDescriptors, matchThreshold);
         });
 
         // Sort newest first
-        matches.sort((a, b) => b.uploadedAt?.toMillis() - a.uploadedAt?.toMillis());
+        matches.sort((a, b) => (b.uploadedAt?.toMillis?.() || 0) - (a.uploadedAt?.toMillis?.() || 0));
         setMatchingPhotos(matches);
     }, [allPhotos, selfieDescriptor, matchThreshold]);
 
@@ -178,7 +178,7 @@ const GalleryView = () => {
                             className="break-inside-avoid glass-panel rounded-xl overflow-hidden shadow-md group relative"
                         >
                             <img
-                                src={photo.url.replace('/upload/', '/upload/w_500,c_fill,q_auto,f_auto/')}
+                                src={photo.url?.replace('/upload/', '/upload/w_500,c_fill,q_auto,f_auto/') || ''}
                                 alt={`Your Memory ${index + 1}`}
                                 className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.05]"
                                 loading="lazy"
