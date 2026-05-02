@@ -14,7 +14,6 @@ services:
     env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
-    plan: free
     envVars:
       # This tells React to use the Python server we just defined above
       - key: VITE_PYTHON_SERVER_URL
