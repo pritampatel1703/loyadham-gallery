@@ -69,26 +69,24 @@ const EventAdmin = () => {
             setProgress({ current: i + 1, total: files.length, status: `Processing Image ${i + 1}/${files.length}...` });
 
             try {
-                // Step 1: Load image into hidden DOM element to allow FaceAPI to read it
-                const objectUrl = URL.createObjectURL(file);
+                setProgress({ current: i + 1, total: files.length, status: `Uploading to Cloud...` });
 
+                // Step 1: Upload to Cloudinary FIRST (so Python server can access the image via URL)
+                const secureUrl = await uploadToCloudinary(file);
+
+                setProgress({ current: i + 1, total: files.length, status: `AI Analyzing Faces...` });
+
+                // Step 2: Load image into hidden DOM element (needed for browser fallback)
+                const objectUrl = URL.createObjectURL(file);
                 await new Promise((resolve, reject) => {
                     imgRef.current.onload = resolve;
                     imgRef.current.onerror = reject;
                     imgRef.current.src = objectUrl;
                 });
 
-                setProgress({ current: i + 1, total: files.length, status: `Extracting Faces...` });
-
-                // Step 2: Extract Face Descriptors
-                const descriptors = await extractFacesFromImage(imgRef.current);
-
-                URL.revokeObjectURL(objectUrl); // Clean up memory
-
-                setProgress({ current: i + 1, total: files.length, status: `Uploading to Cloud...` });
-
-                // Step 3: Upload to Cloudinary
-                const secureUrl = await uploadToCloudinary(file);
+                // Step 3: Extract Face Descriptors (passes Cloudinary URL for Python server)
+                const descriptors = await extractFacesFromImage(imgRef.current, secureUrl);
+                URL.revokeObjectURL(objectUrl);
 
                 // Step 4: Save metadata to Firestore
                 await savePhotoMetadata(eventId, secureUrl, descriptors);

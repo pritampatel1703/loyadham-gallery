@@ -1,0 +1,29 @@
+services:
+  # 1. The Python Backend (AI Face Recognition)
+  - type: web
+    name: loyadham-face-api
+    env: docker
+    rootDir: server-python
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/ping
+    
+  # 2. The React Frontend
+  - type: web
+    name: loyadham-gallery
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    plan: free
+    envVars:
+      # This tells React to use the Python server we just defined above
+      - key: VITE_PYTHON_SERVER_URL
+        fromService:
+          type: web
+          name: loyadham-face-api
+          envVarKey: RENDER_EXTERNAL_URL
+    # Rewrite rules to support React Router
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

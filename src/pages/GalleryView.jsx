@@ -76,22 +76,40 @@ const GalleryView = () => {
     useEffect(() => {
         if (!allPhotos.length || !selfieDescriptor) return;
 
+        console.log(`🔍 Starting face matching: ${allPhotos.length} total photos, selfie embedding length: ${selfieDescriptor.length}`);
+        
+        let noDescriptors = 0;
+        let emptyDescriptors = 0;
+        let parseErrors = 0;
+
         const matches = allPhotos.filter(photo => {
-            if (!photo.descriptors || photo.descriptors === "[]") return false;
+            if (!photo.descriptors || photo.descriptors === "[]") {
+                noDescriptors++;
+                return false;
+            }
 
             let parsedDescriptors = [];
             try {
                 parsedDescriptors = JSON.parse(photo.descriptors);
             } catch (e) {
+                parseErrors++;
                 console.error(e);
                 return false;
             }
 
-            if (!Array.isArray(parsedDescriptors) || parsedDescriptors.length === 0) return false;
+            if (!Array.isArray(parsedDescriptors) || parsedDescriptors.length === 0) {
+                emptyDescriptors++;
+                return false;
+            }
+
+            console.log(`📸 Photo ${photo.id}: ${parsedDescriptors.length} face(s), embedding length: ${parsedDescriptors[0]?.length}`);
 
             // findMatches checks the guest's face array against the array of faces in the photo
             return findMatches(selfieDescriptor, parsedDescriptors);
         });
+
+        console.log(`📊 Results: ${matches.length} matches out of ${allPhotos.length} photos`);
+        console.log(`   ⚠️ ${noDescriptors} photos had no descriptors, ${emptyDescriptors} had empty arrays, ${parseErrors} had parse errors`);
 
         // Sort newest first
         matches.sort((photoA, photoB) => {
