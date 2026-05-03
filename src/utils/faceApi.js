@@ -206,7 +206,9 @@ const cosineSimilarity = (a, b) => {
 export const findMatches = (selfieDescriptor, galleryDescriptorsArray) => {
     // Detect embedding type and set appropriate threshold
     const is512d = selfieDescriptor.length === 512;
-    const THRESHOLD = is512d ? 0.40 : 0.40;
+    // ArcFace (512-d) requires a higher threshold (0.55) to prevent false positives.
+    // The old browser model (1024-d) was much weaker, so we kept it at 0.40.
+    const THRESHOLD = is512d ? 0.55 : 0.40;
 
     const normSelfie = normalize(selfieDescriptor);
     let bestScore = 0;

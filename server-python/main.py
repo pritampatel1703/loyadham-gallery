@@ -398,7 +398,7 @@ def api_search(req: SearchRequest):
         print(f"  Selfie face detected (score: {faces[0]['score']:.3f}). Comparing against gallery...")
 
         # Compare against gallery
-        THRESHOLD = 0.40  # Cosine similarity threshold. ArcFace same-person: 0.5-1.0, different: -0.2 to 0.3
+        THRESHOLD = 0.55  # Cosine similarity threshold. ArcFace same-person: 0.55-1.0, different: -0.2 to 0.4
         matches = []
 
         for item in req.galleryEmbeddings:
